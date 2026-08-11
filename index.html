@@ -45,10 +45,21 @@
   </div>
 
   <div class="left-footer">
-    <button id="leftToggle" class="icon-btn" title="Collapse sidebar">☰</button>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button id="leftToggle" class="icon-btn" title="Collapse sidebar">☰</button>
+      <button id="leftLock" class="icon-btn" title="Lock UI">🔒</button>
+    </div>
     <div class="left-version">v1</div>
   </div>
 </aside>
+
+<!-- ===== Lock overlay (read-only) ===== -->
+<div id="lockOverlay" class="lock-overlay hidden" aria-hidden="true">
+  <div class="lock-box">
+    <div class="lock-icon">🔒</div>
+    <div class="lock-text">Read-only mode enabled — UI locked</div>
+  </div>
+</div>
 
 <!-- ===== Auth screen ===== -->
 <div id="authOverlay" class="pin-overlay">

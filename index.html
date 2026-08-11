@@ -15,7 +15,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
 </head>
-<body>
+<body class="has-left-pane">
+
+<!-- ===== Left pane (new) ===== -->
+<aside id="leftPane" class="left-pane">
+  <div class="left-top">
+    <div class="seal small">
+      <svg viewBox="0 0 40 40" class="seal-icon" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#C9A227" stroke-width="2"/>
+        <text x="20" y="25" text-anchor="middle" font-size="11" fill="#C9A227" font-family="Lora, serif" font-weight="700">MPK</text>
+      </svg>
+    </div>
+    <div class="left-title">MPK District</div>
+  </div>
+
+  <nav class="left-nav">
+    <button class="left-nav-btn active" data-tab="entry">✎ <span class="lbl">Entry</span></button>
+    <button class="left-nav-btn" data-tab="records">☰ <span class="lbl">Records</span></button>
+    <button class="left-nav-btn" data-tab="summary">Σ <span class="lbl">Summary</span></button>
+    <button class="left-nav-btn" data-tab="settings">⚙ <span class="lbl">Settings</span></button>
+  </nav>
+
+  <div class="left-workspace">
+    <label for="leftWorkspace">Workspace</label>
+    <div class="left-workspace-row">
+      <input id="leftWorkspace" type="text" />
+      <button id="leftApplyWorkspace" class="btn btn-sm">Set</button>
+    </div>
+  </div>
+
+  <div class="left-footer">
+    <button id="leftToggle" class="icon-btn" title="Collapse sidebar">☰</button>
+    <div class="left-version">v1</div>
+  </div>
+</aside>
 
 <!-- ===== Auth screen ===== -->
 <div id="authOverlay" class="pin-overlay">

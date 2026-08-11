@@ -27,6 +27,7 @@ function init() {
   bindRecords();
   bindSettings();
   bindAuth();
+  initLeftPane();
   initFirebase();
 }
 
@@ -690,6 +691,116 @@ function saveDropdowns() {
   }
 }
 
+/* ---------- Left pane: init + bindings ---------- */
+function initLeftPane() {
+  const leftPane = document.getElementById("leftPane");
+  if (!leftPane) return;
+
+  // restore collapsed state
+  const collapsed = localStorage.getItem("mpk_left_collapsed") === "1";
+  if (collapsed) {
+    leftPane.classList.add("collapsed");
+    document.body.classList.add("left-collapsed");
+  } else {
+    document.body.classList.add("left-visible");
+  }
+
+  // populate workspace input
+  const wsInput = document.getElementById("leftWorkspace");
+  if (wsInput) wsInput.value = workspaceCode || "";
+
+  // left nav -> main nav (use existing nav buttons)
+  document.querySelectorAll(".left-nav-btn").forEach((btn) => {
+    btn.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      document.querySelectorAll(".left-nav-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+
+      const tab = btn.dataset.tab;
+      const mainBtn = document.querySelector('.nav-btn[data-tab="' + tab + '"]');
+      if (mainBtn) mainBtn.click();
+
+      // close off-canvas on mobile
+      if (window.innerWidth <= 639) leftPane.classList.remove("open");
+    });
+  });
+
+  // workspace apply
+  const applyBtn = document.getElementById("leftApplyWorkspace");
+  applyBtn && applyBtn.addEventListener("click", () => {
+    const v = (document.getElementById("leftWorkspace").value || "").trim();
+    switchWorkspace(v);
+  });
+
+  // collapse / toggle
+  const toggle = document.getElementById("leftToggle");
+  if (toggle) {
+    toggle.addEventListener("click", () => {
+      if (window.innerWidth <= 639) {
+        leftPane.classList.toggle("open");
+        return;
+      }
+      const isCollapsed = leftPane.classList.toggle("collapsed");
+      document.body.classList.toggle("left-collapsed", isCollapsed);
+      document.body.classList.toggle("left-visible", !isCollapsed);
+      localStorage.setItem("mpk_left_collapsed", isCollapsed ? "1" : "0");
+    });
+  }
+
+  // lock/unlock UI (read-only)
+  const lockBtn = document.getElementById("leftLock");
+  const lockOverlay = document.getElementById("lockOverlay");
+  function setLocked(on) {
+    document.body.classList.toggle("ui-locked", on);
+    if (lockOverlay) lockOverlay.classList.toggle("hidden", !on);
+
+    // disable inputs & buttons (except the lock toggle itself)
+    const selectors = 'input, select, textarea, button, a';
+    document.querySelectorAll(selectors).forEach(el => {
+      if (el.id === 'leftLock') return; // keep lock toggle usable
+      if (on) {
+        el.dataset._prevDisabled = el.disabled ? "1" : "0";
+        el.disabled = true;
+        el.style.pointerEvents = 'none';
+        el.style.opacity = '0.6';
+      } else {
+        if (typeof el.dataset._prevDisabled !== 'undefined') {
+          el.disabled = el.dataset._prevDisabled === "1";
+          delete el.dataset._prevDisabled;
+        } else {
+          el.disabled = false;
+        }
+        el.style.pointerEvents = '';
+        el.style.opacity = '';
+      }
+    });
+  }
+  if (lockBtn) {
+    lockBtn.addEventListener("click", () => {
+      const locked = document.body.classList.toggle("ui-locked");
+      setLocked(locked);
+    });
+  }
+
+  // close mobile pane when clicking outside
+  document.addEventListener("click", (ev) => {
+    if (window.innerWidth > 639) return;
+    if (!leftPane.classList.contains("open")) return;
+    if (!leftPane.contains(ev.target) && !ev.target.matches("#leftToggle")) {
+      leftPane.classList.remove("open");
+    }
+  });
+
+  // ensure active left button mirrors current main tab on load
+  const activeMain = document.querySelector('.nav-btn.active');
+  if (activeMain) {
+    const t = activeMain.dataset.tab;
+    const leftActive = document.querySelector(`.left-nav-btn[data-tab="${t}"]`);
+    document.querySelectorAll(".left-nav-btn").forEach(b => b.classList.remove("active"));
+    leftActive && leftActive.classList.add("active");
+  }
+}
+
 /* ---------- Utils ---------- */
 function showToast(msg) {
   const t = document.getElementById("toast");
@@ -699,7 +810,7 @@ function showToast(msg) {
   window._toastTimer = setTimeout(() => t.classList.add("hidden"), 2200);
 }
 function escapeHtml(s) {
-  return (s ?? "").toString().replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  return (s ?? "").toString().replace(/[&<>\"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 }
 
 /* ---------- Register service worker ---------- */

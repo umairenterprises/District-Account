@@ -26,6 +26,35 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 
+/* ===== Left pane (new) ===== */
+.left-pane{
+  position:fixed; left:0; top:0; bottom:0;
+  width:220px; padding:14px; background:#fff; border-right:1px solid var(--line);
+  display:flex; flex-direction:column; gap:12px; z-index:30; box-shadow:var(--shadow);
+}
+.left-top{display:flex; align-items:center; gap:10px;}
+.left-title{font-weight:800; color:var(--green-800);}
+.left-nav{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
+.left-nav-btn{background:none; border:none; text-align:left; padding:10px 8px; border-radius:8px; cursor:pointer; color:var(--ink-soft); font-weight:700; display:flex; align-items:center; gap:8px; font-size:14px;}
+.left-nav-btn.active, .left-nav-btn:hover{background:var(--paper-2); color:var(--green-800);}
+.left-nav-btn .lbl{display:inline-block;}
+.left-workspace label{font-size:12px; color:var(--ink-soft);}
+.left-workspace-row{display:flex; gap:8px; margin-top:6px;}
+.left-footer{margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:8px;}
+.left-version{color:var(--ink-soft); font-size:12px;}
+
+/* collapsed */
+.left-pane.collapsed{width:64px;}
+.left-pane.collapsed .lbl{display:none;}
+.left-pane.collapsed .left-title{display:none;}
+
+/* mobile off-canvas */
+@media (max-width:639px){
+  .left-pane{transform:translateX(-110%); transition:transform .28s ease; width:260px;}
+  .left-pane.open{transform:translateX(0); box-shadow:0 6px 30px rgba(0,0,0,0.12);}
+  body.has-left-pane{padding-left:0;}
+}
+
 /* ===== Topbar ===== */
 .topbar{
   display:flex;
@@ -68,7 +97,7 @@ body{
   font-size:17px;
   cursor:pointer;
 }
-.icon-btn:active{transform:scale(0.92);}
+.icon-btn:active{transform:scale(0.92);} 
 
 /* ===== Tabs ===== */
 .tab-panel{display:none; padding:16px; max-width:640px; margin:0 auto;}
@@ -257,4 +286,6 @@ input:focus, select:focus{
 
 @media (min-width:640px){
   .topbar, .bottom-nav{max-width:640px; margin:0 auto; left:0; right:0;}
+  body.has-left-pane main, body.has-left-pane .topbar, body.has-left-pane .bottom-nav { max-width: calc(640px); margin-left:220px; }
+  body.left-collapsed main, body.left-collapsed .topbar, body.left-collapsed .bottom-nav { margin-left:64px; }
 }

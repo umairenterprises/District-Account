@@ -27,6 +27,7 @@ function init() {
   bindRecords();
   bindSettings();
   bindAuth();
+  bindTextSize();
   initFirebase();
 }
 
@@ -61,6 +62,7 @@ function initFirebase() {
         document.getElementById("userLine").textContent = "👤 " + (user.displayName || user.email);
         document.getElementById("accountInfo").textContent =
           (user.displayName || "") + (user.email ? " · " + user.email : "");
+        document.getElementById("sidebarUserInfo").textContent = "👤 " + (user.displayName || user.email);
         ensureUserDoc(user);
         document.getElementById("adminCard").classList.toggle("hidden", !isAdmin(user));
         if (isAdmin(user)) renderVolunteerList();
@@ -220,6 +222,21 @@ function friendlyAuthError(err) {
   return map[err.code] || err.message;
 }
 
+/* ---------- Text size ---------- */
+const TEXT_SCALES = { small: 0.88, medium: 1, large: 1.2 };
+function bindTextSize() {
+  const saved = localStorage.getItem("mpk_textsize") || "medium";
+  applyTextSize(saved);
+  document.querySelectorAll(".textsize-btn").forEach((btn) => {
+    btn.addEventListener("click", () => applyTextSize(btn.dataset.size));
+  });
+}
+function applyTextSize(size) {
+  document.documentElement.style.setProperty("--text-scale", TEXT_SCALES[size] || 1);
+  localStorage.setItem("mpk_textsize", size);
+  document.querySelectorAll(".textsize-btn").forEach((b) => b.classList.toggle("active", b.dataset.size === size));
+}
+
 /* ---------- Navigation ---------- */
 function bindNav() {
   const sidebar = document.getElementById("sidebar");
@@ -238,6 +255,7 @@ function bindNav() {
     sidebar.classList.contains("open") ? closeSidebar() : openSidebar();
   });
   overlay.addEventListener("click", closeSidebar);
+  document.getElementById("sidebarCloseBtn").addEventListener("click", closeSidebar);
 
   document.querySelectorAll(".side-nav-btn").forEach((btn) => {
     btn.addEventListener("click", () => {

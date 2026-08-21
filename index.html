@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#1B4332" />
+<title>MPK District Account Register</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/icon-192.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ===== Left sidebar (collapsible nav) ===== -->
+<div id="sidebarOverlay" class="sidebar-overlay hidden"></div>
+<nav id="sidebar" class="sidebar">
+  <div class="sidebar-header">
+    <svg viewBox="0 0 40 40" class="seal-icon" aria-hidden="true">
+      <circle cx="20" cy="20" r="18" fill="none" stroke="#C9A227" stroke-width="2"/>
+      <text x="20" y="25" text-anchor="middle" font-size="11" fill="#C9A227" font-family="Lora, serif" font-weight="700">MPK</text>
+    </svg>
+    <span class="sidebar-title">MPK Register</span>
+    <button id="sidebarCloseBtn" class="sidebar-close" aria-label="Close menu">×</button>
+  </div>
+  <button class="side-nav-btn active" data-tab="entry">
+    <span class="nav-icon">✎</span><span>Entry</span>
+  </button>
+  <button class="side-nav-btn" data-tab="records">
+    <span class="nav-icon">☰</span><span>Records</span>
+  </button>
+  <button class="side-nav-btn" data-tab="summary">
+    <span class="nav-icon">Σ</span><span>Summary</span>
+  </button>
+  <button class="side-nav-btn" data-tab="settings">
+    <span class="nav-icon">⚙</span><span>Settings</span>
+  </button>
+  <div class="sidebar-footer" id="sidebarUserInfo">—</div>
+</nav>
+
+<!-- ===== Auth screen ===== -->
+<div id="authOverlay" class="pin-overlay">
+  <div class="pin-box auth-box">
+    <div class="seal large">
+      <svg viewBox="0 0 40 40" class="seal-icon" aria-hidden="true">
+        <circle cx="20" cy="20" r="18" fill="none" stroke="#C9A227" stroke-width="2"/>
+        <text x="20" y="25" text-anchor="middle" font-size="11" fill="#C9A227" font-family="Lora, serif" font-weight="700">MPK</text>
+      </svg>
+    </div>
+    <p class="auth-title">MPK District Account</p>
+
+    <form id="loginForm" class="auth-form">
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input type="email" id="loginEmail" required placeholder="aapka@email.com" />
+      </div>
+      <div class="field">
+        <label for="loginPassword">Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••" />
+      </div>
+      <p id="authError" class="dup-warning hidden"></p>
+      <button type="submit" id="loginBtn" class="btn btn-primary auth-btn">Login</button>
+    </form>
+    <p class="auth-note">Account nahi hai? Apne admin se account banwayein.</p>
+  </div>
+</div>
+
+<!-- ===== Top bar ===== -->
+<header class="topbar">
+  <button id="menuBtn" class="icon-btn menu-btn" title="Menu" aria-label="Menu">☰</button>
+  <div class="seal">
+    <svg viewBox="0 0 40 40" class="seal-icon" aria-hidden="true">
+      <circle cx="20" cy="20" r="18" fill="none" stroke="#C9A227" stroke-width="2"/>
+      <circle cx="20" cy="20" r="13" fill="none" stroke="#C9A227" stroke-width="1"/>
+      <text x="20" y="25" text-anchor="middle" font-size="11" fill="#C9A227" font-family="Lora, serif" font-weight="700">MPK</text>
+    </svg>
+  </div>
+  <div class="topbar-text">
+    <h1>MPK District Account</h1>
+    <p id="statusLine" class="status-line">
+      <span id="statusDot" class="status-dot offline"></span>
+      <span id="statusText">Connecting…</span>
+    </p>
+    <p id="userLine" class="status-line hidden"></p>
+  </div>
+  <button id="logoutBtn" class="icon-btn" title="Logout" aria-label="Logout">⏻</button>
+</header>
+
+<!-- ===== Tab panels ===== -->
+<main id="app">
+
+  <!-- ENTRY TAB -->
+  <section id="tab-entry" class="tab-panel active">
+    <form id="entryForm" class="receipt-form" autocomplete="off">
+      <input type="hidden" id="entryId" />
+
+      <div class="field-row two">
+        <div class="field">
+          <label for="f_date">Date *</label>
+          <input type="date" id="f_date" required />
+        </div>
+        <div class="field">
+          <label for="f_book">Book No *</label>
+          <input type="text" id="f_book" inputmode="numeric" required placeholder="e.g. 12" />
+        </div>
+      </div>
+
+      <div class="field-row two">
+        <div class="field">
+          <label for="f_receipt">Receipt No *</label>
+          <input type="text" id="f_receipt" inputmode="numeric" required placeholder="e.g. 045" class="receipt-input" />
+        </div>
+        <div class="field">
+          <label for="f_accountType">Account Type *</label>
+          <select id="f_accountType" required></select>
+        </div>
+      </div>
+      <p id="dupWarning" class="dup-warning hidden">⚠ Ye Book + Receipt No pehle se maujood hai</p>
+
+      <div class="field-row two">
+        <div class="field">
+          <label for="f_department">Department *</label>
+          <select id="f_department" required></select>
+        </div>
+        <div class="field">
+          <label for="f_subhead">Sub Head *</label>
+          <select id="f_subhead" required></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f_city">City *</label>
+        <select id="f_city" required></select>
+      </div>
+
+      <div class="field">
+        <label for="f_donor">Donor / Name / Account *</label>
+        <input type="text" id="f_donor" list="donorList" required placeholder="Donor ka naam" />
+        <datalist id="donorList"></datalist>
+      </div>
+
+      <div class="field">
+        <label for="f_amount">Amount (Rs) *</label>
+        <input type="number" id="f_amount" min="0" step="1" inputmode="decimal" required placeholder="0" class="amount-input" />
+      </div>
+
+      <div class="field-row two">
+        <div class="field">
+          <label for="f_mobile">Mobile Number</label>
+          <input type="tel" id="f_mobile" inputmode="tel" placeholder="03XX-XXXXXXX" />
+        </div>
+        <div class="field">
+          <label for="f_email">Email</label>
+          <input type="email" id="f_email" placeholder="optional" />
+        </div>
+      </div>
+
+      <div class="field-row two">
+        <div class="field">
+          <label for="f_refname">Reference Name</label>
+          <input type="text" id="f_refname" list="refList" placeholder="optional" />
+          <datalist id="refList"></datalist>
+        </div>
+        <div class="field">
+          <label for="f_refmobile">Reference Mobile No</label>
+          <input type="tel" id="f_refmobile" inputmode="tel" placeholder="optional" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" id="cancelEditBtn" class="btn btn-ghost hidden">Cancel edit</button>
+        <button type="submit" id="saveBtn" class="btn btn-primary">Receipt Save Karein</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- RECORDS TAB -->
+  <section id="tab-records" class="tab-panel">
+    <div class="records-toolbar">
+      <input type="search" id="searchInput" placeholder="Search: naam, book, receipt, city…" />
+      <div class="export-row">
+        <button id="exportCsvBtn" class="btn btn-outline btn-sm">Export CSV</button>
+        <button id="exportXlsxBtn" class="btn btn-outline btn-sm">Export Excel</button>
+        <button id="backupBtn" class="btn btn-outline btn-sm">Backup JSON</button>
+      </div>
+      <div class="export-row import-row">
+        <button id="downloadTemplateBtn" class="btn btn-outline btn-sm">📄 Template Download Karein</button>
+        <button id="importDataBtn" class="btn btn-primary btn-sm">⬆ Purana Data Import Karein</button>
+        <input type="file" id="importFileInput" accept=".xlsx,.xls,.csv" class="hidden" />
+      </div>
+      <p id="importStatus" class="hint import-status hidden"></p>
+    </div>
+    <div id="recordsList" class="records-list"></div>
+    <p id="recordsEmpty" class="empty-state hidden">Abhi koi entry nahi hai. Entry tab se pehli receipt add karein.</p>
+  </section>
+
+  <!-- SUMMARY TAB -->
+  <section id="tab-summary" class="tab-panel">
+    <div class="summary-cards" id="summaryTotals"></div>
+    <h3 class="section-heading">Book-wise Totals</h3>
+    <div id="summaryByBook" class="summary-table"></div>
+    <h3 class="section-heading">City-wise Totals</h3>
+    <div id="summaryByCity" class="summary-table"></div>
+  </section>
+
+  <!-- SETTINGS TAB -->
+  <section id="tab-settings" class="tab-panel">
+    <div class="settings-card">
+      <h3>Text Size</h3>
+      <p class="hint">Poori app ka text size choose karein.</p>
+      <div class="textsize-options">
+        <button class="textsize-btn" data-size="small">Small</button>
+        <button class="textsize-btn active" data-size="medium">Medium</button>
+        <button class="textsize-btn" data-size="large">Large</button>
+      </div>
+    </div>
+
+    <div class="settings-card">
+      <h3>Workspace</h3>
+      <p class="hint">Sab volunteers isi code se connect hon to unka data ek hi jagah sync hoga.</p>
+      <div class="field">
+        <label for="workspaceCodeInput">Workspace Code</label>
+        <input type="text" id="workspaceCodeInput" />
+      </div>
+      <button id="saveWorkspaceBtn" class="btn btn-outline btn-sm">Save Workspace Code</button>
+    </div>
+
+    <div class="settings-card">
+      <h3>Dropdown Lists Manage Karein</h3>
+      <p class="hint">Account Type, Department, Sub Head aur City ki list yahan se edit karein — sab devices par sync hoga.</p>
+      <div class="dropdown-editor" id="dropdownEditor"></div>
+    </div>
+
+    <div class="settings-card">
+      <h3>Aapka Account</h3>
+      <p class="hint" id="accountInfo">—</p>
+      <button id="logoutBtn2" class="btn btn-outline btn-sm">Logout</button>
+    </div>
+
+    <div class="settings-card hidden" id="adminCard">
+      <h3>Manage Volunteers</h3>
+      <p class="hint">Naye volunteer ka account yahan se banayein. Wo login karke turant use kar sakega.</p>
+      <form id="createVolunteerForm">
+        <div class="field">
+          <label for="newVolName">Naam</label>
+          <input type="text" id="newVolName" required placeholder="e.g. Ahmed Khan" />
+        </div>
+        <div class="field-row two">
+          <div class="field">
+            <label for="newVolEmail">Email</label>
+            <input type="email" id="newVolEmail" required placeholder="volunteer@email.com" />
+          </div>
+          <div class="field">
+            <label for="newVolPassword">Password</label>
+            <input type="text" id="newVolPassword" required placeholder="Kam se kam 6 characters" />
+          </div>
+        </div>
+        <p id="createVolError" class="dup-warning hidden"></p>
+        <button type="submit" class="btn btn-outline btn-sm">Volunteer Account Banayein</button>
+      </form>
+      <h4 class="vol-list-heading">Volunteers</h4>
+      <div id="volunteerList" class="records-list"></div>
+    </div>
+
+    <div class="settings-card danger-card">
+      <h3>Danger Zone</h3>
+      <button id="restoreBtn" class="btn btn-outline btn-sm">Backup JSON Restore Karein</button>
+      <input type="file" id="restoreFileInput" accept="application/json" class="hidden" />
+    </div>
+  </section>
+
+</main>
+
+<!-- ===== Toast ===== -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- Firebase SDKs (compat build — simplest for a single-file app) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<!-- SheetJS for Excel export -->
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script src="firebase-config.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
